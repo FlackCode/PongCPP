@@ -14,6 +14,7 @@ struct Render_State {
 
 global_variable Render_State render_state;
 
+#include "platform_common.cpp"
 #include "renderer.cpp"
 
 //void* memory;
@@ -84,18 +85,43 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         0);
     HDC hdc = GetDC(window);
 
+    Input input = {};
+
     while (running) {
         //Input
         MSG message;
+
+        for (int i = 0; i < BUTTON_COUNT; i++) {
+            input.buttons[i].changed = false;
+        }
+
         while (PeekMessageA(&message, window, 0, 0, PM_REMOVE)) {
-            TranslateMessage(&message);
-            DispatchMessageA(&message);
+            switch (message.message) {
+                case WM_KEYUP:
+                case WM_KEYDOWN: {
+                    u32 vk_code = (u32)message.wParam;
+                    bool is_down = ((message.lParam & (1 << 31)) == 0);
+
+                    switch (vk_code) {
+                        case VK_UP: {
+                            input.buttons[BUTTON_UP].is_down = is_down;
+                            input.buttons[BUTTON_UP].changed = true;
+                        } break;
+                    }
+                } break;
+                default: {
+                    TranslateMessage(&message);
+                    DispatchMessageA(&message);
+                }
+                
+            }
         }
         //Simulate
-        // we got black as our default color so now we iterate through every w/h pixel.
-        // create a pixel pointer and then paint it to orange
+        
+
         clear_screen(0xffffff);
-        draw_rect(0, 0, 10, 10, 0xff0000);
+        if(input.buttons[BUTTON_UP].is_down)
+            draw_rect(0, 0, 10, 10, 0xff0000);
         draw_rect(30, 30, 5, 5, 0xff0000);
         draw_rect(-20, 20, 8, 3, 0xff0000);
 
