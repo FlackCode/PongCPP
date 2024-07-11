@@ -6,8 +6,6 @@ inline int clamp(int min, int val, int max) {
     return val;
 }
 
-// we got black as our default color so now we iterate through every w/h pixel.
-// create a pixel pointer and then paint it to orange
 internal void clear_screen(u32 color) {
     u32* pixel = (u32*)render_state.memory;
     for (int y = 0; y < render_state.height; y++) {
@@ -48,7 +46,6 @@ internal void draw_arena_borders(float arena_x, float arena_y, u32 color) {
 	draw_rect_in_pixels(x1, y0, render_state.width, render_state.height, color);
 }
 
-//first 2 is coords from center, next 2 is size, last is color
 internal void draw_rect(float x, float y, float half_size_x, float half_size_y, u32 color) {
     x *= render_state.height*render_scale;
     y *= render_state.height * render_scale;
@@ -57,14 +54,11 @@ internal void draw_rect(float x, float y, float half_size_x, float half_size_y, 
 
     x += render_state.width / 2.f;
     y += render_state.height / 2.f;
-    
 
-    //convert to pixels
     int x0 = x - half_size_x;
     int x1 = x + half_size_x;
     int y0 = y - half_size_y;
     int y1 = y + half_size_y;
-
 
     draw_rect_in_pixels(x0, y0, x1, y1, color);
 }

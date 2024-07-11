@@ -3,8 +3,6 @@
 
 global_variable bool running = true;
 
-//cleanup time
-
 struct Render_State {
     int height, width;
     void* memory;
@@ -17,11 +15,6 @@ global_variable Render_State render_state;
 #include "platform_common.cpp"
 #include "renderer.cpp"
 #include "game.cpp"
-
-//void* memory;
-//int width;
-//int height;
-//BITMAPINFO bitmap_info;
 
 LRESULT CALLBACK windowCallback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     LRESULT result = 0;
@@ -36,13 +29,8 @@ LRESULT CALLBACK windowCallback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
             GetClientRect(hwnd, &rect);
             render_state.width = rect.right - rect.left;
             render_state.height = rect.bottom - rect.top;
-            //creating the buffer size
             int buffer_size = render_state.width * render_state.height * sizeof(unsigned int);
-            
-            // if the buffer memory is already allocated but we resize the window, 
-            // free the memory and reallocate the memory depending on the window size
             if (render_state.memory) VirtualFree(render_state.memory, 0, MEM_RELEASE);
-            //allocating memory to the buffer, allowing to read and write to it.
             render_state.memory = VirtualAlloc(0, buffer_size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
             render_state.bitmap_info.bmiHeader.biSize = sizeof(render_state.bitmap_info.bmiHeader);
@@ -71,10 +59,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     windowClass.lpfnWndProc = windowCallback;
 
     // Register
-    // Pointer points to the location of a certain thing in order for it to 
     RegisterClassA(&windowClass);
 
-    // Create window
     HWND window = CreateWindowA(
         windowClass.lpszClassName,
         "Pong - Flack",
