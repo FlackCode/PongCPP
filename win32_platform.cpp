@@ -62,6 +62,8 @@ LRESULT CALLBACK windowCallback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 }
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
+    ShowCursor(FALSE);
+
     // Window Class
     WNDCLASSA windowClass = {};
     windowClass.style = CS_HREDRAW | CS_VREDRAW;
@@ -75,7 +77,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
     // Create window
     HWND window = CreateWindowA(
         windowClass.lpszClassName,
-        "My First Game",
+        "Pong - Flack",
         WS_OVERLAPPEDWINDOW | WS_VISIBLE,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
@@ -84,6 +86,15 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
         0, 0,
         hInstance,
         0);
+
+    {
+        SetWindowLongA(window, GWL_STYLE, GetWindowLongA(window, GWL_STYLE) & ~WS_OVERLAPPEDWINDOW);
+        MONITORINFO mi = { sizeof(mi) };
+        GetMonitorInfo(MonitorFromWindow(window, MONITOR_DEFAULTTOPRIMARY), &mi);
+        SetWindowPos(window, HWND_TOP, mi.rcMonitor.left, mi.rcMonitor.top,
+            mi.rcMonitor.right - mi.rcMonitor.left, mi.rcMonitor.bottom - mi.rcMonitor.top, SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+    }
+
     HDC hdc = GetDC(window);
 
     Input input = {};
@@ -116,8 +127,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 #define process_button(b, vk)\
 case vk: { \
-input.buttons[b].is_down = is_down; \
-input.buttons[b].changed = is_down != input.buttons[b].is_down; \
+if (input.buttons[b].is_down != is_down) { \
+        input.buttons[b].is_down = is_down; \
+        input.buttons[b].changed = true; \
+    } \
 } break;
 
                     switch (vk_code) {
@@ -125,8 +138,9 @@ input.buttons[b].changed = is_down != input.buttons[b].is_down; \
                         process_button(BUTTON_DOWN, VK_DOWN);
                         process_button(BUTTON_W, 'W');
                         process_button(BUTTON_S, 'S');
-                        //process_button(BUTTON_LEFT, VK_LEFT);
-                        //process_button(BUTTON_RIGHT, VK_RIGHT);
+                        process_button(BUTTON_LEFT, VK_LEFT);
+                        process_button(BUTTON_RIGHT, VK_RIGHT);
+                        process_button(BUTTON_ENTER, VK_RETURN);
                         
                     }
                 } break;
